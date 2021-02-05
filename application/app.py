@@ -4,6 +4,7 @@ import importlib
 from flask import Flask, jsonify
 
 from .extentions import db
+from .exceptions import ApplicationException
 
 
 def create_app(config_filename):
@@ -21,6 +22,13 @@ def create_app(config_filename):
 
     with app.app_context():
         db.init_app(app)
+
+    # Register the error handler
+    @app.errorhandler(ApplicationException)
+    def handle_invalid_usage(error):
+        response = jsonify(error.to_dict())
+        response.status_code = error.status_code
+        return response
 
     return app
 
