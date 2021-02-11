@@ -1,11 +1,27 @@
+from uuid import uuid4
+from datetime import datetime
+
 from pymongo import MongoClient
 
+from application.config import Config
 
-class LoggerRepository(object):
-    def __init__(self):
+
+class Logger(object):
+    def __init__(self, log):
         mongo_client = MongoClient('localhost', 27017)
-        database = mongo_client.flask
-        self.collection = database.mycol
+        database = mongo_client[Config.LOGGER_DATABASE]
+        self.collection = database[Config.LOGGER_COLLECTION]
+        self.log = {
+            "_id": str(uuid4()),
+            "action": log.action if log.action else None,
+            "actor": log.actor if log.actor else None,
+            "level": log.level if log.level else None,
+            "code": log.code if log.code else None,
+            "message": log.message if log.message else None,
+            "_input": log._input if log._input else None,
+            "_output": log._output if log._output else None,
+            "created_at": datetime.now().isoformat(),
+        }
 
     def to_dict(self, data_source):
         result = []
@@ -14,11 +30,11 @@ class LoggerRepository(object):
 
         return result
 
-    def insert_one(self, data):
-        return self.collection.insert_one(data)
+    def insert_one(self):
+        return self.collection.insert_one(self.log)
 
     def insert_many(self, data):
-        return self.collection.insert_many(data)
+        return self.collection.insert_many(self.log)
 
     def find_all(self, conditions=None, fields=None, skip=0, limit=0):
         collection = self.collection
