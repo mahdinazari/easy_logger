@@ -3,7 +3,7 @@ from threading import Thread
 from flask import Blueprint, jsonify
 
 from models.log import Log
-from controller.logger import Logger
+from controllers.logger import Logger
 from application.utils import Foo
 
 
