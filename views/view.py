@@ -2,9 +2,9 @@ from threading import Thread
 
 from flask import Blueprint, jsonify
 
-from application.utils import Foo
 from models.log import Log
-from application.mongodb_repository import MycolRepository
+from controllers.logger import Logger
+from application.utils import Foo
 
 
 blueprint = Blueprint('view', __name__, url_prefix='/api/v1')
@@ -18,12 +18,12 @@ def main():
 @blueprint.route('/hello')
 def hello():
     log = Log(
-        verb="status",
-        status_code=200,
-        message="message"
+        action="status",
+        code=200,
+        message="message",
     )
-    aaa = MycolRepository()
-    aaa.insert_one({"verb":log.verb, "code": log.status_code, "message":log.message})
+    logger = Logger(log)
+    logger.insert_one()
 
     Foo.exception_code = None
     Foo.exception_message = None
